@@ -11,7 +11,7 @@ This repository presents the design and verification of a **Complex Logic Module
 The main goal of this project was to design a multi-stage logic tree capable of processing 8-bit input vectors through alternating layers of logic gates (AND/OR). Key focus areas include:
 - Scalable and parametric hardware design using advanced `generate` loops.
 - Hardware synthesis analysis (understanding the mapping of combinational logic to FPGA LUT resources).
-- Functional verification using automated **testbenches** and timing analysis.
+- Functional verification using **testbenches** and timing analysis.
 
 ## Logic Architecture & Parametric Generation
 
@@ -28,9 +28,8 @@ Instead of manually instantiating gates, the architecture leverages a highly opt
 Below is the Elaborated Design schematic from Vivado, confirming the correct inference of the alternating combinational logic tree:
 
 ![RTL Schematic](docs/rtl_schematic.png) 
-*(Note: Replace with your actual RTL schematic image)*
 
-**Hardware Mapping Note:** In the actual Xilinx FPGA architecture, these discrete AND/OR gates are not implemented directly. Instead, Vivado's synthesis engine collapses this multi-stage combinational path and maps it efficiently into the 6-input **Look-Up Tables (LUTs)** within the Configurable Logic Blocks (CLBs).
+**Hardware Mapping Note:** In the actual Xilinx FPGA architecture, these discrete AND/OR gates are not implemented directly. Instead, Vivado's synthesis engine collapses this multi-stage combinational path and maps it efficiently into the 6-input **Look-Up Tables (LUTs)** within the Configurable Logic Blocks (CLBs). But the project was done for educational purposes.
 
 ## Simulation and Verification
 
@@ -40,10 +39,14 @@ To validate the design, a comprehensive testbench (`tb_modulo_logic.v`) was deve
 - **Alternating Bit Patterns:** e.g., Activating every second bit (`0x55`) to verify independent branch propagation without crosstalk.
 
 ### Simulation Waveform
-The simulation waveform confirms correct functional behavior with 0-cycle latency (purely combinational logic).
+
+The simulation waveform confirms correct functional behavior with 0-cycle latency (purely combinational logic). More importantly, the internal 2D `tree` signal array is expanded to demonstrate the stage-by-stage data reduction.
 
 ![Simulation Waveform](docs/waveform.png)
-*(Note: Replace with your actual XSim waveform image)*
+
+**Key Simulation Insights:**
+* **Stage-by-Stage Reduction:** The expanded `tree[0]` through `tree[3]` signals (displayed in binary radix) clearly illustrate the data width halving at each layer (from 8 active bits down to a single output bit).
+* **Hardware Optimization (High-Impedance States):** The presence of `z` states on the upper bits (e.g., `zzzz1111` on `tree[1]` and `zzzzzz11` on `tree[2]`) proves that the `generate` loop dynamically trims unused wire connections. Instead of instantiating unnecessary logic gates or dummy wires, the synthesizer leaves these upper bits unconnected.
 
 ## Repository Structure & Reproduction
 
@@ -59,11 +62,11 @@ complex_logic_module/
 └── build_project.tcl   # Tcl script to recreate the Vivado project
 ```
 
-**How to recreate the Vivado project
+**How to recreate the Vivado project**
 
 You can rebuild the Vivado project locally using the included Tcl script. Follow the steps below to recreate the project and set up the simulation environment.
 
-**Option 1 — Vivado GUI
+**Option 1 — Vivado GUI**
 
 1. Clone this repository to your machine.
 2. Open **Xilinx Vivado**.
@@ -81,10 +84,3 @@ You can rebuild the Vivado project locally using the included Tcl script. Follow
 ```
 
 Vivado will recreate the project, import the source files, and configure the simulation environment automatically.
-
-** Option 2: Using Command Line (Tcl Mode)
-Open your terminal or command prompt and run:
-
-'''Bash
-vivado -mode tcl -source build_project.tcl
-'''
