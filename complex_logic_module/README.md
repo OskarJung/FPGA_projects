@@ -1,5 +1,9 @@
 # FPGA Complex Logic Module Design – Portfolio Project
 
+![Verilog](https://img.shields.io/badge/Language-Verilog-blue.svg)
+![Vivado](https://img.shields.io/badge/Tool-Xilinx_Vivado-orange.svg)
+![FPGA](https://img.shields.io/badge/Hardware-FPGA-lightgrey.svg)
+
 This repository presents the design and verification of a **Complex Logic Module** implemented in **Verilog HDL**. The project was developed as part of an advanced FPGA systems course and demonstrates the transition from structural logic design to more advanced behavioral modeling, parametric generation, and hardware synthesis using **Xilinx Vivado**.
 
 ## Project Objective
@@ -24,7 +28,7 @@ Instead of manually instantiating gates, the architecture leverages a highly opt
 Below is the Elaborated Design schematic from Vivado, confirming the correct inference of the alternating combinational logic tree:
 
 ![RTL Schematic](docs/rtl_schematic.png) 
-*(Note: Add a screenshot of the RTL Schematic from Vivado here)*
+*(Note: Replace with your actual RTL schematic image)*
 
 **Hardware Mapping Note:** In the actual Xilinx FPGA architecture, these discrete AND/OR gates are not implemented directly. Instead, Vivado's synthesis engine collapses this multi-stage combinational path and maps it efficiently into the 6-input **Look-Up Tables (LUTs)** within the Configurable Logic Blocks (CLBs).
 
@@ -39,11 +43,11 @@ To validate the design, a comprehensive testbench (`tb_modulo_logic.v`) was deve
 The simulation waveform confirms correct functional behavior with 0-cycle latency (purely combinational logic).
 
 ![Simulation Waveform](docs/waveform.png)
-*(Note: Add a screenshot of the XSim waveform showing the test vectors here)*
+*(Note: Replace with your actual XSim waveform image)*
 
 ## Repository Structure & Reproduction
 
-To maintain a clean version control history, this repository does not include heavy Vivado project files (`.xpr`). 
+To maintain a clean version control history, this repository does not include heavy, auto-generated Vivado project files (`.xpr`, `.cache`, etc.). Instead, the project is fully version-controlled using source files and a Tcl build script.
 
 ```text
 complex_logic_module/
@@ -53,3 +57,33 @@ complex_logic_module/
 │   └── modulo_logic.v
 ├── docs/               # Documentation and schematics
 └── build_project.tcl   # Tcl script to recreate the Vivado project
+
+**How to recreate the Vivado project
+
+You can rebuild the Vivado project locally using the included Tcl script. Follow the steps below to recreate the project and set up the simulation environment.
+
+**Option 1 — Vivado GUI
+
+1. Clone this repository to your machine.
+2. Open **Xilinx Vivado**.
+3. In Vivado, open the **Tcl Console** (usually at the bottom of the window).
+4. Change directory to the cloned repository (use forward slashes on Windows):
+ 
+```tcl
+ cd C:/Path/To/Your/Cloned/Repo/complex_logic_module
+```
+
+5. Run the build script:
+ 
+```tcl
+ source build_project.tcl
+```
+
+Vivado will recreate the project, import the source files, and configure the simulation environment automatically.
+
+** Option 2: Using Command Line (Tcl Mode)
+Open your terminal or command prompt and run:
+
+'''Bash
+vivado -mode tcl -source build_project.tcl
+'''
