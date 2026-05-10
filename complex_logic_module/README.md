@@ -57,6 +57,7 @@ complex_logic_module/
 │   └── modulo_logic.v
 ├── docs/               # Documentation and schematics
 └── build_project.tcl   # Tcl script to recreate the Vivado project
+```
 
 **How to recreate the Vivado project
 
