@@ -48,12 +48,12 @@ Below are the Elaborated Design schematics from Xilinx Vivado, confirming the co
 The verification was conducted in two stages, utilizing a "bottom-up" approach to ensure both mathematical correctness and system-level data integrity. The testbenches strictly separate synthesizable RTL code from non-synthesizable simulation code (Verification IPs using `$fopen`, `$fgetc`, `$fwrite`).
 
 ### Stage 1: Transmitter (TX) Unit Test & Oracle Verification
-The `uart_tx` module was isolated (`tb_uart_tx.v`). Raw bytes were injected into the FSM from a binary file (`dane_we.bin`).
+The `uart_tx` module was isolated (`tb_uart_tx.v`). Raw bytes were injected into the FSM from a binary file (`in_data.bin`).
 
 ![TX Waveform](docs/waveform_tx.png)
 **Waveform Insights:** The zoomed-in waveform captures the transmission of a single character ('a' / `0x61`). You can clearly observe the custom frame: the Idle state, the Start bit (`1`), the LSB-first data shift, and the Stop bit (`0`). The module operates with maximum throughput, showing only a 2-cycle idle gap between back-to-back transmissions.
 
-**Python Automated Verification:** The simulated serial bitstream was dumped to `dane_wyj.bin`. A custom Python oracle script (`scripts/read.py`) reads the original input, mathematically generates the expected serial bitstream, and compares it against the Vivado output.
+**Python Automated Verification:** The simulated serial bitstream was dumped to `out_data.bin`. A custom Python oracle script (`scripts/read.py`) reads the original input, mathematically generates the expected serial bitstream, and compares it against the Vivado output.
 
 ```text
 loaded text: 'alamapsaidwakoty'
@@ -70,8 +70,8 @@ Vivado start:    011000011000010011011000011000011000011011011000011000011000
 
 With the TX module verified, the receiver (`uart_rx.v`) was integrated to create a full transceiver loopback (`tb_uart_system.v`). The TX serial output (`txd`) was directly wired to the RX serial input (`rxd`).
 
-
-**Waveform Insights:** This system-level waveform captures the complete datapath. Thanks to the double-buffering fix mentioned earlier, the `data_rx` bus transitions perfectly and cleanly (e.g., from 'a' to 'l') exactly when the `received` flag pulses. There is zero glitching. The reconstructed bytes were written back into a text file (`dane_ascii_wyj.txt`), completely matching the original input, proving 100% end-to-end data integrity.
+![TX Waveform](docs/waveform_system.png)
+**Waveform Insights:** This system-level waveform captures the complete datapath. Thanks to the double-buffering fix mentioned earlier, the `data_rx` bus transitions perfectly and cleanly (e.g., from 'a' to 'l') exactly when the `received` flag pulses. There is zero glitching. The reconstructed bytes were written back into a text file (`ascii_data_out.bin`), completely matching the original input, proving 100% end-to-end data integrity.
 
 ## Repository Structure & Reproduction
 
@@ -105,7 +105,4 @@ source build_project.tcl
 
 ```
 
-
 5. Vivado will automatically recreate the project, configure relative paths, import sources/simulations, and set up the environment. You can then run the Behavioral Simulation or the Synthesis.
-
-```
