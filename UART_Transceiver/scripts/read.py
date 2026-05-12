@@ -7,7 +7,7 @@ out_path = os.path.join(script_dir, "../data/out_data.bin")
 with open(in_path, "r", encoding="utf-8") as file:
     enter_txt = file.read().strip() 
 
-print(f"Wczytano napis do wyslania: '{enter_txt}'")
+print(f"loaded text: '{enter_txt}'")
 
 expected_bits = ""
 
