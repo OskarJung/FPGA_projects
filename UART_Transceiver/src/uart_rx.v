@@ -14,6 +14,7 @@ module uart_rx(
     
     reg [1:0] state = STATE0;
     reg [7:0] r_data;
+    reg [7:0] data_out_reg = 8'd0;
     reg [2:0] cnt = 3'b0;
     
     always @(posedge clk) begin
@@ -43,6 +44,7 @@ module uart_rx(
                 STATE3: begin
                     if (rxd == 1'b0) begin
                         received <= 1;
+                        data_out_reg <= r_data;
                         state <= STATE0;
                     end
                 end
@@ -50,6 +52,5 @@ module uart_rx(
         end 
     end
     
-    assign data = r_data; 
-    
+    assign data = data_out_reg;
 endmodule
