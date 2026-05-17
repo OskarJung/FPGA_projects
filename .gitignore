@@ -6,7 +6,7 @@
 *.pb
 *.mti
 .Xil/
-/build/
+build/
 
 # Vivado generated directories
 *.hw/
