@@ -39,7 +39,7 @@ module tb_rgb2hsv();
         hsync_in = 0;
         vsync_in = 0;
         
-        $display("\n================ start simulation ================\n");
+        $display("\n================ START Simulation ================\n");
         
         #20; 
         
@@ -72,19 +72,21 @@ module tb_rgb2hsv();
         de_in    = 0;
         pixel_in = 24'd0;
 
-        // Wait for pipeline flush;
+        // Wait for pipeline flush
         #150; 
-        $display("\n================ END Simulation =====================\n");
+        $display("\n================ END SIMULATION =====================\n");
         $finish;
     end
 
     // Monitor block - verifying outputs independently
     always @(posedge clk) begin
         if (de_out) begin
-        //    $display("Time: %0t | H = %d, S = %d, V = %d", 
-        //             $time, sim_H, sim_S, sim_V);
-            $display("Time: %0t | R = %d, G = %d, B = %d", 
-                    $time, dut.r_01_d1, dut.g_01_d1, dut.b_01_d1);
+//            $display("Time: %0t | H = %d, S = %d, V = %d", 
+//                     $time, sim_H, sim_S, sim_V);
+              $display("Time: %0t | R = %d, G = %d, B = %d", 
+                       $time, dut.r_01_d1, dut.g_01_d1, dut.b_01_d1);
+              $display("Time: %0t | MAX = %d, MIN = %d, max_idx = %d, min_idx = %d", 
+                       $time, dut.MAX, dut.MIN, dut.MAX_idx, dut.MIN_idx);
         end
     end
 
