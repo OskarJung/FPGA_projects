@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module rgb_to_hsv(
+module rgb2hsv(
     input clk,
     input [23:0] pixel_in,
     input de_in,
