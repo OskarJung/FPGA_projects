@@ -16,6 +16,10 @@ build/
 *.runs/
 *.cache/
 *.xpr
+# ip_core
+ip_core/*/*
+!ip_core/*/*.xci
+
 
 # OS generated files
 .DS_Store
