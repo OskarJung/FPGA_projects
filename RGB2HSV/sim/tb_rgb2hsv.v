@@ -50,43 +50,77 @@ module tb_rgb2hsv();
         de_in    = 1;
         hsync_in = 1;
 
+        @(negedge clk);
+        de_in = 0;
+
+        #100
         // Test 2: white (R=120, G=120, B=120)
         @(negedge clk);
         pixel_in = {8'd120, 8'd120, 8'd120}; 
-        hsync_in = 0;
+        de_in    = 1;
 
+        @(negedge clk);
+        de_in = 0;
+
+        #100
         // Test 3: red (R=50, G=200, B=100)
         @(negedge clk);
         pixel_in = {8'd50, 8'd200, 8'd100}; 
+        de_in    = 1;
 
+        @(negedge clk);
+        de_in = 0;
+
+        #100
         // Test 4: 
         @(negedge clk);
         pixel_in = {8'd10, 8'd50, 8'd250}; 
+        de_in    = 1;
 
+        @(negedge clk);
+        de_in = 0;
+
+        #100
         // Test 5: matlab (R=255, G=100, B=123)
         @(negedge clk);
         pixel_in = {8'd255, 8'd0, 8'd0}; 
+        de_in    = 1;
 
+        @(negedge clk);
+        de_in = 0;
+
+        #100
         // End of valid data stream
         @(negedge clk);
-        de_in    = 0;
         pixel_in = 24'd0;
 
         // Wait for pipeline flush
+
+
         #150; 
         $display("\n================ END SIMULATION =====================\n");
         $finish;
     end
 
-    // Monitor block - verifying outputs independently
+// Monitor block - weryfikacja niezależnie dla każdego etapu potoku
+    
+    // Etap 1: Po dzieleniu (Latencja 18)
     always @(posedge clk) begin
-        if (de_out) begin
-//            $display("Time: %0t | H = %d, S = %d, V = %d", 
-//                     $time, sim_H, sim_S, sim_V);
-              $display("Time: %0t | R = %d, G = %d, B = %d", 
-                       $time, dut.r_01_d1, dut.g_01_d1, dut.b_01_d1);
-              $display("Time: %0t | MAX = %d, MIN = %d, max_idx = %d, min_idx = %d", 
-                       $time, dut.MAX, dut.MIN, dut.MAX_idx, dut.MIN_idx);
+        if (dut.de_after_div) begin
+            $display("Time: %0t | STAGE 1 | R_sfix = %d, G_sfix = %d, B_sfix = %d", 
+                     $time, dut.r_01, dut.g_01, dut.b_01);
+        end
+
+        if (dut.de_after_min_max) begin
+            $display("Time: %0t | STAGE 2 | MAX = %d, MIN = %d, max_idx = %d, min_idx = %d", 
+                     $time, dut.MAX, dut.MIN, dut.MAX_idx, dut.MIN_idx);
+        end
+
+        if (dut.de_after_C) begin
+            // Zmienna C_01 jest zdefiniowana jako signed, więc %d poprawnie wydrukuje znak ujemny
+            $display("Time: %0t | STAGE 3 | C = %d (hex: %h)", 
+                     $time, dut.C_01, dut.C_01);
+            $display("-----------------------------------------------------");
         end
     end
 
