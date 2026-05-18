@@ -4,7 +4,7 @@
     "xci_name": "div_S_L22",
     "component_reference": "xilinx.com:ip:div_gen:5.1",
     "ip_revision": "19",
-    "gen_directory": "../../../../RGBtoHSV.gen/sources_1/ip/div_S_L22",
+    "gen_directory": "../../../../rbg2hsv.gen/sources_1/ip/div_S_L22",
     "parameters": {
       "component_parameters": {
         "Component_Name": [ { "value": "div_S_L22", "resolve_type": "user", "usage": "all" } ],
@@ -76,7 +76,7 @@
         "IPCONTEXT": [ { "value": "IP_Flow" } ],
         "IPREVISION": [ { "value": "19" } ],
         "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "../../../../RGBtoHSV.gen/sources_1/ip/div_S_L22" } ],
+        "OUTPUTDIR": [ { "value": "../../../../rbg2hsv.gen/sources_1/ip/div_S_L22" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "." } ],
         "SWVERSION": [ { "value": "2022.2" } ],

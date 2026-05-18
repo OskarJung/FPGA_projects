@@ -1,13 +1,13 @@
 {
   "schema": "xilinx.com:schema:json_instance:1.0",
   "ip_inst": {
-    "xci_name": "divider_unsigned_L18",
+    "xci_name": "div_unsigned_L18",
     "component_reference": "xilinx.com:ip:div_gen:5.1",
     "ip_revision": "19",
-    "gen_directory": "../../../../RGBtoHSV.gen/sources_1/ip/divider_unsigned_L18",
+    "gen_directory": "../../../../rbg2hsv.gen/sources_1/ip/div_unsigned_L18",
     "parameters": {
       "component_parameters": {
-        "Component_Name": [ { "value": "divider_unsigned_L18", "resolve_type": "user", "usage": "all" } ],
+        "Component_Name": [ { "value": "div_unsigned_L18", "resolve_type": "user", "usage": "all" } ],
         "algorithm_type": [ { "value": "Radix2", "resolve_type": "user", "usage": "all" } ],
         "dividend_and_quotient_width": [ { "value": "8", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "dividend_has_tuser": [ { "value": "false", "resolve_type": "user", "format": "bool", "usage": "all" } ],
@@ -76,7 +76,7 @@
         "IPCONTEXT": [ { "value": "IP_Flow" } ],
         "IPREVISION": [ { "value": "19" } ],
         "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "../../../../RGBtoHSV.gen/sources_1/ip/divider_unsigned_L18" } ],
+        "OUTPUTDIR": [ { "value": "../../../../rbg2hsv.gen/sources_1/ip/div_unsigned_L18" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "." } ],
         "SWVERSION": [ { "value": "2022.2" } ],

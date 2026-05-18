@@ -23,7 +23,7 @@ wire de_after_div;
 wire signed [15:0] r_d_255, g_d_255, b_d_255; 
 
 ///---div R 255 ----------
-   divider_unsigned_L18 R_div_255 (
+   div_unsigned_L18 R_div_255 (
         .aclk(clk), // input wire aclk
         // input wire divisior tvalis and [7:0] tdata
         .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata(8'd255),
@@ -33,7 +33,7 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
         .m_axis_dout_tvalid(de_after_div), .m_axis_dout_tdata(r_d_255));
     
 ///---div G 255 ----------
-   divider_unsigned_L18 G_div_255 (
+   div_unsigned_L18 G_div_255 (
       .aclk(clk),
       .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata(8'd255),      
       .s_axis_dividend_tvalid(de_in), .s_axis_dividend_tdata(G_in),    
@@ -41,7 +41,7 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
     );
 
 ///---div B 255 ---------- 
-   divider_unsigned_L18 b_div_255 (
+   div_unsigned_L18 b_div_255 (
       .aclk(clk),                                      
       .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata(8'd255),     
       .s_axis_dividend_tvalid(de_in), .s_axis_dividend_tdata(B_in),    
@@ -90,36 +90,44 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
 //===========================
 // Calculate C = MAX - MIN. latency 2
 //===========================
-        wire signed [9:0] C_01; 
+        wire signed [9:0] C; 
         wire de_after_C;
 
         //latency 2
         C_substracter_L2 C_sub (
-            .CLK(clk), .CE(1'b1),
+            .CLK(clk),
             .A(MAX), .B(MIN), // in [9 : 0]
-            .S(C_01)   // out [9 : 0]
+            .S(C)   // out [9 : 0]
         );
         
         Delay_Line #(.N(1), .DELAY(2)) 
             delay_after_C (.clk(clk), .ce(1'b1), .idata(de_after_min), .odata(de_after_C));         
         
 //===========================
-// Calculate S        
-// ==========================        
-    // wire signed [23:0] S_reg;
+// Calculate S latency 22   
+// ========================== 
+    // Signal equalization for V division module
+    // wire signed [9:0] MAX_d2;
+    // Delay_Line #(.N(10), .DELAY(2)) 
+    //     delay_V_for_S (.clk(clk), .ce(1'b1), .idata(MAX), .odata(MAX_d2));
+    
+    // wire signed [9:0] divisor_V_for_S = (MAX_d2 == 10'd0) ? 10'd1 : MAX_d2; // Avoid division by zero
+
+    // wire signed [23:0] S_div;
+
     // div_S_L22 div_S (.aclk(clk), 
     //     // input wire divisior tvalis and [15:0] tdata
-    //     .s_axis_divisor_tvalid(de_after_C), .s_axis_divisor_tdata(C_01), 
+    //     .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata(divisor_V_for_S), 
     //     // input wire dividend tvalid and [15:0] tdata     
-    //     .s_axis_dividend_tvalid(de_after_min_max), .s_axis_dividend_tdata(MAX), 
+    //     .s_axis_dividend_tvalid(de_after_C), .s_axis_dividend_tdata(C), 
     //     // output wire dout tvalid and [23:0] tdata   
-    //     .m_axis_dout_tvalid(de_after_2D), .m_axis_dout_tdata(S_reg)         
+    //     .m_axis_dout_tvalid(de_after_S), .m_axis_dout_tdata(S_div)         
     // );
 
     // wire signed [9:0] S_01; 
     // assign S_01[9] = S_reg[23];
-    // assign b_01[8] = S_reg[8];  // integer part of the result
-    // assign b_01[7:0] = S_reg[7:0]; // fractional part of the result
+    // assign G_01[8] = S_reg[8];  // integer part of the result
+    // assign G_01[7:0] = S_reg[7:0]; // fractional part of the result
         
 // ==================================
 // delay synchronization signal and final assignment

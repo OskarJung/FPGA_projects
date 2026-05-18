@@ -118,7 +118,7 @@ module tb_rgb2hsv();
 
         if (dut.de_after_C) begin
             $display("Time: %0t | STAGE 3 | C = %d (hex: %h)", 
-                     $time, dut.C_01, dut.C_01);
+                     $time, dut.C, dut.C);
             $display("-----------------------------------------------------");
         end
     end
