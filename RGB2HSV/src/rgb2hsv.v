@@ -106,7 +106,7 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
 //===========================
 // Calculate S latency 22   
 // ========================== 
-    // Signal equalization for V division module
+    // // Signal equalization for V division module
     // wire signed [9:0] MAX_d2;
     // Delay_Line #(.N(10), .DELAY(2)) 
     //     delay_V_for_S (.clk(clk), .ce(1'b1), .idata(MAX), .odata(MAX_d2));
@@ -116,18 +116,18 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
     // wire signed [23:0] S_div;
 
     // div_S_L22 div_S (.aclk(clk), 
-    //     // input wire divisior tvalis and [15:0] tdata
+    //     // input wire divisior tvalis and [9:0] tdata
     //     .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata(divisor_V_for_S), 
-    //     // input wire dividend tvalid and [15:0] tdata     
+    //     // input wire dividend tvalid and [9:0] tdata     
     //     .s_axis_dividend_tvalid(de_after_C), .s_axis_dividend_tdata(C), 
     //     // output wire dout tvalid and [23:0] tdata   
     //     .m_axis_dout_tvalid(de_after_S), .m_axis_dout_tdata(S_div)         
     // );
 
-    // wire signed [9:0] S_01; 
-    // assign S_01[9] = S_reg[23];
-    // assign G_01[8] = S_reg[8];  // integer part of the result
-    // assign G_01[7:0] = S_reg[7:0]; // fractional part of the result
+    // wire signed [9:0] S; 
+    // assign S[9] = S_div[23]; 
+    // assign S[8] = S_div[8];  // integer part of the result
+    // assign S[7:0] = S_div[7:0]; // fractional part of the result
         
 // ==================================
 // delay synchronization signal and final assignment
