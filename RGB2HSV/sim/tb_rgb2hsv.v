@@ -121,6 +121,12 @@ module tb_rgb2hsv();
                      $time, dut.C, dut.C);
             $display("-----------------------------------------------------");
         end
+
+        if (dut.de_after_S) begin
+            $display("Time: %0t | STAGE 4 | S = %d (hex: %h)", 
+                     $time, dut.S_final, dut.S_final);
+            $display("-----------------------------------------------------");
+        end
     end
 
 endmodule
