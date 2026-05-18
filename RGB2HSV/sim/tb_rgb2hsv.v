@@ -108,10 +108,10 @@ module tb_rgb2hsv();
     always @(posedge clk) begin
         if (dut.de_after_div) begin
             $display("Time: %0t | STAGE 1 | R_sfix = %d, G_sfix = %d, B_sfix = %d", 
-                     $time, dut.r_01, dut.g_01, dut.b_01);
+                     $time, dut.R_sfix, dut.G_sfix, dut.B_sfix);
         end
 
-        if (dut.de_after_min_max) begin
+        if (dut.de_after_min) begin
             $display("Time: %0t | STAGE 2 | MAX = %d, MIN = %d, max_idx = %d, min_idx = %d", 
                      $time, dut.MAX, dut.MIN, dut.MAX_idx, dut.MIN_idx);
         end

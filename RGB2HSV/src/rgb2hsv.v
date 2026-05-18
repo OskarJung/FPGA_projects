@@ -51,54 +51,48 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
 //============================
 //2. unsigned to signed
 //=============================
-    wire signed [9:0] r_01, g_01, b_01;
-    assign r_01[9] =1'b0;
-    assign r_01[8] = r_d_255[8]; // integer part 
-    assign r_01[7:0] = r_d_255[7:0]; // fractional part
+    wire signed [9:0] R_sfix, G_sfix, B_sfix;
+    assign R_sfix[9] =1'b0;
+    assign R_sfix[8] = r_d_255[8]; // integer part 
+    assign R_sfix[7:0] = r_d_255[7:0]; // fractional part
 
-    assign g_01[9] =1'b0;
-    assign g_01[8] = g_d_255[8]; 
-    assign g_01[7:0] = g_d_255[7:0]; 
+    assign G_sfix[9] =1'b0;
+    assign G_sfix[8] = g_d_255[8]; 
+    assign G_sfix[7:0] = g_d_255[7:0]; 
 
-    assign b_01[9] =1'b0;
-    assign b_01[8] = b_d_255[8];
-    assign b_01[7:0] = b_d_255[7:0];
+    assign B_sfix[9] =1'b0;
+    assign B_sfix[8] = b_d_255[8];
+    assign B_sfix[7:0] = b_d_255[7:0];
     
-//===================
+//===================================
 //3. calculate min and max lanency 1
-//===================  
-    wire [9:0] MAX, MIN;
+//===================================
+    wire signed [9:0] MAX, MIN;
     wire [1:0] MAX_idx, MIN_idx;
-    
-    wire signed [30:0] rgb_01_d1;
-    
-    Delay_Line #(.N(31), .DELAY(1)) 
-        delay_rgb_01 (.clk(clk), .ce(1'b1), .idata({de_after_div, r_01, g_01, b_01}), .odata(rgb_01_d1));
+    wire de_after_max, de_after_min;
 
-    wire de_after_min_max = rgb_01_d1[30];
-    wire signed [9:0] r_01_d1 = rgb_01_d1[29:20];
-    wire signed [9:0] g_01_d1 = rgb_01_d1[19:10];
-    wire signed [9:0] b_01_d1 = rgb_01_d1[9:0];
-    
     //latency #1
     max_rgb #(.N(10))
-        max (.clk(clk),.ce(1'b1), 
-            .R(r_01),.G(g_01),.B(b_01), // input R, G, B in [9:0]
-            .MAX(MAX), .MAX_idx(MAX_idx) //output MAX [9:0] and MAX_idx [1:0]
+        max (.clk(clk), .de_in(de_after_div), 
+            .R(R_sfix),.G(G_sfix),.B(B_sfix), // input R, G, B in [9:0]
+            .MAX(MAX), .MAX_idx(MAX_idx), //output MAX [9:0] and MAX_idx [1:0]
+            .de_out(de_after_max) // output valid signal for MAX
             );
     
     //latency #1
     min_rgb #(.N(10))
-        min (.clk(clk),.ce(1'b1),
-            .R(r_01),.G(g_01),.B(b_01),
-            .MIN(MIN),.MIN_idx(MIN_idx)
+        min (.clk(clk), .de_in(de_after_div),
+            .R(R_sfix), .G(G_sfix),.B(B_sfix),
+            .MIN(MIN), .MIN_idx(MIN_idx),
+            .de_out(de_after_min)
             );  
 
 //===========================
 // Calculate C = MAX - MIN. latency 2
 //===========================
-
         wire signed [9:0] C_01; 
+        wire de_after_C;
+
         //latency 2
         C_substracter_L2 C_sub (
             .CLK(clk), .CE(1'b1),
@@ -106,9 +100,8 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
             .S(C_01)   // out [9 : 0]
         );
         
-        wire de_after_C;
         Delay_Line #(.N(1), .DELAY(2)) 
-            delay_after_C (.clk(clk), .ce(1'b1), .idata(de_after_min_max), .odata(de_after_C));         
+            delay_after_C (.clk(clk), .ce(1'b1), .idata(de_after_min), .odata(de_after_C));         
         
 //===========================
 // Calculate S        
