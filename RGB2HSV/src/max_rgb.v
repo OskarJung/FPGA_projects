@@ -2,16 +2,18 @@
 
 module max_rgb #(parameter N = 8)(
     input wire clk,
-    input wire ce,
+    input wire de_in,
     input wire [N-1:0] R,
     input wire [N-1:0] G,
     input wire [N-1:0] B,
     output reg [N-1:0] MAX,
-    output reg [1:0] MAX_idx
+    output reg [1:0] MAX_idx,
+    output reg de_out
     );
     
     always @(posedge clk) begin
-    if (ce) begin
+        de_out <= de_in;
+        
         if (R >= G && R >= B) begin
             MAX <= R;
             MAX_idx <= 2'd0;
@@ -24,7 +26,6 @@ module max_rgb #(parameter N = 8)(
             MAX <= B;
             MAX_idx <= 2'd2;
         end 
-    end
     end
     
 endmodule

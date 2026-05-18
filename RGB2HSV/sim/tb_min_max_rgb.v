@@ -2,10 +2,12 @@
 
 module tb_min_max_rgb();
     reg clk = 1'b0;
-    reg ce = 1'b0; 
+    reg de_in = 1'b0; 
     reg [7:0] R; 
     reg [7:0] G;
     reg [7:0] B;
+    wire de_out_max;
+    wire de_out_min;
     
     wire [7:0] MAX;
     wire [7:0] MIN;
@@ -15,23 +17,25 @@ module tb_min_max_rgb();
     max_rgb #(.N(8))
         dut_max (
             .clk(clk),
-            .ce(ce),
+            .de_in(de_in),
             .R(R),
             .G(G),
             .B(B),
             .MAX(MAX),
-            .MAX_idx(MAX_idx)
+            .MAX_idx(MAX_idx),
+            .de_out(de_out_max)
          );
 
     min_rgb #(.N(8))
         dut_min (
             .clk(clk),
-            .ce(ce),
+            .de_in(de_in),
             .R(R),
             .G(G),
             .B(B),
             .MIN(MIN),
-            .MIN_idx(MIN_idx)
+            .MIN_idx(MIN_idx),
+            .de_out(de_out_min)
          );              
     
     always #1 clk = ~clk;
@@ -40,7 +44,7 @@ module tb_min_max_rgb();
         R = 8'd255; G = 8'd100; B = 8'd190;
       
         @(negedge clk); 
-        ce = 1'b1; 
+        de_in = 1'b1; 
         
         @(negedge clk);
         

@@ -102,9 +102,9 @@ module tb_rgb2hsv();
         $finish;
     end
 
-// Monitor block - weryfikacja niezależnie dla każdego etapu potoku
+// Monitor block - verify intermediate signals at each stage of the pipeline
     
-    // Etap 1: Po dzieleniu (Latencja 18)
+    // Etap 1: after_division (Latencja 18)
     always @(posedge clk) begin
         if (dut.de_after_div) begin
             $display("Time: %0t | STAGE 1 | R_sfix = %d, G_sfix = %d, B_sfix = %d", 
@@ -117,7 +117,6 @@ module tb_rgb2hsv();
         end
 
         if (dut.de_after_C) begin
-            // Zmienna C_01 jest zdefiniowana jako signed, więc %d poprawnie wydrukuje znak ujemny
             $display("Time: %0t | STAGE 3 | C = %d (hex: %h)", 
                      $time, dut.C_01, dut.C_01);
             $display("-----------------------------------------------------");
