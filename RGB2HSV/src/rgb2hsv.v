@@ -116,20 +116,26 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
     wire signed [23:0] S_div;
 
     div_S_L22 div_S (.aclk(clk), 
-        // input wire divisior tvalis and [9:0] tdata
+        // input wire divisior tvalis and [15:0] tdata
         .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata(divisor_V_for_S), 
-        // input wire dividend tvalid and [9:0] tdata     
-        .s_axis_dividend_tvalid(de_after_C), .s_axis_dividend_tdata(C), 
+        // input wire dividend tvalid and [15:0] tdata     
+        .s_axis_dividend_tvalid(de_after_C), .s_axis_dividend_tdata({{5{C[9]}}, C, 1'b0}), 
         // output wire dout tvalid and [23:0] tdata   
         .m_axis_dout_tvalid(de_after_S), .m_axis_dout_tdata(S_div)         
     );
 
     wire signed [9:0] S; 
     assign S[9] = S_div[23]; 
-    assign S[8] = S_div[8];  // integer part of the result
-    assign S[7:0] = S_div[7:0]; // fractional part of the result
+    assign S[8] = S_div[8];  // integer part 
+    assign S[7:0] = S_div[7:0]; // fractional part
         
-    wire signed [9:0] S_final = (MAX_d2 == 0) ? 10'd0 : S; // If MAX is zero, set S to zero
+    wire is_max_zero = (MAX_d2 == 10'd0);
+    wire is_max_zero_d22; 
+
+    Delay_Line #(.N(1), .DELAY(22)) 
+        delay_max_zero_flag (.clk(clk), .ce(1'b1), .idata(is_max_zero), .odata(is_max_zero_d22));
+            
+    wire signed [9:0] S_final = (is_max_zero_d22) ? 10'd0 : S;
 // ==================================
 // delay synchronization signal and final assignment
 //=================================

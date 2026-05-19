@@ -138,6 +138,9 @@ fprintf('RGB_ufix  (hex) : R=%s, G=%s, B=%s\n', R_ufix.hex, G_ufix.hex, B_ufix.h
 fprintf('RGB_sfix  (int) : R=%d, G=%d, B=%d\n', R_sfix.int, G_sfix.int, B_sfix.int);
 fprintf('MAX_val   (int) : %d    Min_val (int) : %d\n',MAX_val.int, MIN_val.int);
 fprintf('C         (int) : %d            (hex) : %s\n', C.int, C.hex);
+fprintf('S_div     (int) : %f\n', S_div);
+fprintf('S_fix     (int) : %d            (hex) : %s\n', S_fix.int, S_fix.hex);
+% fprintf('S_out %d', S_div.int)
 
 % fprintf('\nFIXED-POINT MODEL RESULTS [0-255]:\n');
 % fprintf('H: %d\n', H_out);
