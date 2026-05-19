@@ -7,7 +7,6 @@ module tb_divider_test();
     wire [23:0] dout;
     wire valid;
 
-    // Instancja Twojej dzielarki
     div_unsign_S_L19 uut (
         .aclk(clk),
         .s_axis_divisor_tvalid(1'b1),
