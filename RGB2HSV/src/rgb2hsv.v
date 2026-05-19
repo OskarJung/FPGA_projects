@@ -117,17 +117,16 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
 
     div_S_L22 div_S (.aclk(clk), 
         // input wire divisior tvalis and [15:0] tdata
-        .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata(divisor_V_for_S), 
+        .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata({6'b0, divisor_V_for_S}), 
         // input wire dividend tvalid and [15:0] tdata     
-        .s_axis_dividend_tvalid(de_after_C), .s_axis_dividend_tdata({{5{C[9]}}, C, 1'b0}), 
+        .s_axis_dividend_tvalid(de_after_C), .s_axis_dividend_tdata({6'b0, C}), 
         // output wire dout tvalid and [23:0] tdata   
         .m_axis_dout_tvalid(de_after_S), .m_axis_dout_tdata(S_div)         
     );
 
     wire signed [9:0] S; 
     assign S[9] = S_div[23]; 
-    assign S[8] = S_div[8];  // integer part 
-    assign S[7:0] = S_div[7:0]; // fractional part
+    assign S[8:0] = {S_div[7:0], 1'b0};
         
     wire is_max_zero = (MAX_d2 == 10'd0);
     wire is_max_zero_d22; 

@@ -8,12 +8,12 @@ module tb_divider_test();
     wire valid;
 
     // Instancja Twojej dzielarki
-    div_S_L22 uut (
+    div_unsign_S_L19 uut (
         .aclk(clk),
         .s_axis_divisor_tvalid(1'b1),
-        .s_axis_divisor_tdata({6'b0, divisor}),
+        .s_axis_divisor_tdata(divisor),
         .s_axis_dividend_tvalid(1'b1),
-        .s_axis_dividend_tdata({6'b0, dividend}),
+        .s_axis_dividend_tdata(dividend),
         .m_axis_dout_tvalid(valid),
         .m_axis_dout_tdata(dout)
     );
@@ -25,7 +25,7 @@ module tb_divider_test();
         dividend = 10'd156;
         divisor  = 10'd256;
         #100;
-        $display("result HEX: %h, DEC: %d", {dout[7:0], 1'b0}, {dout[7:0], 1'b0});
+        $display("result HEX: %h, DEC: %d", dout[9:0], dout[9:0]);
         $finish;
     end
 endmodule
