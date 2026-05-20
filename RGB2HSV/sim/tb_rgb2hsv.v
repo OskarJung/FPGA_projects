@@ -126,6 +126,10 @@ module tb_rgb2hsv();
                      $time, dut.S_final, dut.S_final);
             $display("-----------------------------------------------------");
         end
+        if (dut.de_after_H_sub) begin
+            $display("Time: %0t | STAGE 5 (H_num) | MAX_idx = %d, H_arg_A = %d, H_arg_B = %d, H_num = %d", 
+                 $time, dut.MAX_idx, dut.H_arg_A, dut.H_arg_B, dut.H_num);
+        end
     end
 
 endmodule

@@ -12,13 +12,18 @@ module rgb2hsv(
     output vsync_out    
 );
 
-    wire [7:0] R_in = pixel_in[23:16];
-    wire [7:0] G_in = pixel_in [15:8];
-    wire [7:0] B_in = pixel_in [7:0];
+wire [7:0] R_in = pixel_in[23:16];
+wire [7:0] G_in = pixel_in [15:8];
+wire [7:0] B_in = pixel_in [7:0];
+
+// localparam total_latency = 0;
     
 // ==================================
 // 1. first divide by 255. latency 18
 //=================================  
+// total_latency = total_latency + 18;
+//================================
+
 wire de_after_div;  
 wire signed [15:0] r_d_255, g_d_255, b_d_255; 
 
@@ -65,8 +70,10 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
     assign B_sfix[7:0] = b_d_255[7:0];
     
 //===================================
-//3. calculate min and max lanency 1
+//3. calculate min and max latency 1
 //===================================
+// total_latency = total_latency + 1;
+//==================================
     wire signed [9:0] MAX, MIN;
     wire [1:0] MAX_idx, MIN_idx;
     wire de_after_max, de_after_min;
@@ -90,6 +97,8 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
 //===========================
 // Calculate C = MAX - MIN. latency 2
 //===========================
+// total_latency = total_latency + 2;
+//============================
         wire signed [9:0] C; 
         wire de_after_C;
 
@@ -106,6 +115,8 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
 //===========================
 // Calculate S latency 19  
 // ========================== 
+// total_latency = total_latency + 19;
+//===========================
     // Signal equalization for V division module
     wire [8:0] MAX_d2;
     Delay_Line #(.N(10), .DELAY(2)) 
@@ -136,14 +147,57 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
         delay_max_zero_flag (.clk(clk), .ce(1'b1), .idata(is_max_zero), .odata(is_max_zero_d22));
             
     wire signed [9:0] S_final = (is_max_zero_d22) ? 10'd0 : S;
-// ==================================
+
+//=============================
+// ============ Calculate H latency 22 =============
+// ============================
+// total_latency = total_latency + 22;
+//=============================
+
+// ------- 1. MUX 1: Numerator selection based on maximum channel // latency 1
+wire signed [9:0] R_sfix_d1, G_sfix_d1, B_sfix_d1;// R,G,B_sfix delay equalized with MAX_idx
+Delay_Line #(.N(30), .DELAY(1)) 
+    delay_RGB_for_H (.clk(clk), .ce(1'b1), .idata({R_sfix, G_sfix, B_sfix}), .odata({R_sfix_d1, G_sfix_d1, B_sfix_d1}));
+
+reg signed [9:0] H_arg_A, H_arg_B;
+
+always @(*) begin
+    case (MAX_idx)
+        2'd0: begin H_arg_A = G_sfix_d1; H_arg_B = B_sfix_d1; end
+        2'd1: begin H_arg_A = B_sfix_d1; H_arg_B = R_sfix_d1; end
+        2'd2: begin H_arg_A = R_sfix_d1; H_arg_B = G_sfix_d1; end
+        default: begin H_arg_A = 10'd0; H_arg_B = 10'd0; end
+    endcase
+end
+
+// ------- 2. Subtracter for H numerator //latency 2
+wire signed [10:0] H_num;
+wire signed de_after_H_sub;  //should be qual to de_after_C
+
+//latency 2
+H_substracter_L2 H_num_sub (
+    .CLK(clk),
+    .A(H_arg_A), .B(H_arg_B), // in [9:0]
+    .S(H_num)   // out [10:0]
+);
+
+Delay_Line #(.N(1), .DELAY(2)) 
+    delay_after_H_num (.clk(clk), .ce(1'b1), .idata(de_after_max), .odata(de_after_H_sub));
+
+//-----3 . Division for H // latency 19
+wire [23:0] H_div;
+wire V_for_H = MAX_d2;
+
+
+
+// =================================================
 // delay synchronization signal and final assignment
-//=================================
+//=================================================
     
     wire [2:0] sync_in  = {de_in, hsync_in, vsync_in};
     wire [2:0] sync_out;
     
-    Delay_Line #(.N(3), .DELAY(21)) 
+    Delay_Line #(.N(3), .DELAY(22)) 
         delay_sync (.clk(clk), .ce(1'b1), .idata(sync_in), .odata(sync_out));
     
     assign de_out    = sync_out[2];
