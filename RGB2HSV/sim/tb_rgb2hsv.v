@@ -130,6 +130,11 @@ module tb_rgb2hsv();
             $display("Time: %0t | STAGE 5 (H_num) | MAX_idx = %d, H_arg_A = %d, H_arg_B = %d, H_num = %d", 
                  $time, dut.MAX_idx, dut.H_arg_A, dut.H_arg_B, dut.H_num);
         end
+        if (dut.de_after_H_div) begin
+            $display("Time: %0t | STAGE 6 (H_fraction) | H_fraction = %d (hex: %h)", 
+                     $time, dut.H_fraction, dut.H_fraction);
+            $display("-----------------------------------------------------");
+        end
     end
 
 endmodule

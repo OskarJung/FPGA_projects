@@ -119,7 +119,7 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
 //===========================
     // Signal equalization for V division module
     wire [8:0] MAX_d2;
-    Delay_Line #(.N(10), .DELAY(2)) 
+    Delay_Line #(.N(9), .DELAY(2)) 
         delay_V_for_S (.clk(clk), .ce(1'b1), .idata(MAX[8:0]), .odata(MAX_d2));
     
     wire [8:0] divisor_V_for_S = (MAX_d2 == 9'd0) ? 9'd1 : MAX_d2; // Avoid division by zero
@@ -129,9 +129,9 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
 
     div_unsign_S_L19 div_S (.aclk(clk), 
         // input wire divisior tvalis and [15:0] tdata
-        .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata({6'b0, divisor_V_for_S}), 
+        .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata({7'b0, divisor_V_for_S}), 
         // input wire dividend tvalid and [15:0] tdata     
-        .s_axis_dividend_tvalid(de_after_C), .s_axis_dividend_tdata({6'b0, C[8:0]}), 
+        .s_axis_dividend_tvalid(de_after_C), .s_axis_dividend_tdata({7'b0, C[8:0]}), 
         // output wire dout tvalid and [23:0] tdata   
         .m_axis_dout_tvalid(de_after_S), .m_axis_dout_tdata(S_div)         
     );
@@ -141,12 +141,12 @@ wire signed [15:0] r_d_255, g_d_255, b_d_255;
     assign S[8:0] = S_div[8:0];
         
     wire is_max_zero = (MAX_d2 == 9'd0);
-    wire is_max_zero_d22; 
+    wire is_max_zero_d19; 
 
     Delay_Line #(.N(1), .DELAY(19)) 
-        delay_max_zero_flag (.clk(clk), .ce(1'b1), .idata(is_max_zero), .odata(is_max_zero_d22));
+        delay_max_zero_flag (.clk(clk), .ce(1'b1), .idata(is_max_zero), .odata(is_max_zero_d19));
             
-    wire signed [9:0] S_final = (is_max_zero_d22) ? 10'd0 : S;
+    wire signed [9:0] S_final = (is_max_zero_d19) ? 10'd0 : S;
 
 //=============================
 // ============ Calculate H latency 22 =============
@@ -185,10 +185,38 @@ Delay_Line #(.N(1), .DELAY(2))
     delay_after_H_num (.clk(clk), .ce(1'b1), .idata(de_after_max), .odata(de_after_H_sub));
 
 //-----3 . Division for H // latency 19
-wire [23:0] H_div;
-wire V_for_H = MAX_d2;
+// prepare H_num for division: make it unsigned and handle negative values
+wire sign_H_num = H_num[10]; // sign bit
+wire [10:0] H_num_abs = sign_H_num ? (~H_num + 1'b1) : H_num; // absolute value of H_num
 
+wire sign_H_num_after_div;
+Delay_Line #(.N(1), .DELAY(19)) 
+    delay_sign_H_num (.clk(clk), .ce(1'b1), .idata(sign_H_num), .odata(sign_H_num_after_div));
 
+//divide H_num_abs by C to get H_fraction
+wire [8:0] divisior_C_for_H = (C[8:0] == 9'd0) ? 9'd1 : C[8:0]; // Avoid division by zero
+wire [23:0] H_div_unsigned;
+wire de_after_H_div;
+
+div_unsign_S_L19 div_H (.aclk(clk), 
+    // input wire divisior tvalis and [15:0] tdata
+    .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tdata({7'b0, divisior_C_for_H}),
+    // input wire dividend tvalid and [15:0] tdata     
+    .s_axis_dividend_tvalid(de_after_H_sub), .s_axis_dividend_tdata({7'b0, H_num_abs[8:0]}), 
+    // output wire dout tvalid and [23:0] tdata   
+    .m_axis_dout_tvalid(de_after_H_div), .m_axis_dout_tdata(H_div_unsigned)         
+);
+
+wire [9:0] H_div_mag = {1'b0, H_div_unsigned[8:0]};
+wire signed [9:0] H_div_signed; 
+assign H_div_signed = sign_H_num_after_div ? (~H_div_mag + 1'b1) : H_div_mag;
+
+wire is_C_zero = (C[8:0] == 9'd0);
+wire is_C_zero_d19;
+Delay_Line #(.N(1), .DELAY(19)) 
+    delay_C_zero_flag (.clk(clk), .ce(1'b1), .idata(is_C_zero), .odata(is_C_zero_d19));
+
+wire signed [9:0] H_fraction = (is_C_zero_d19) ? 10'd0 : H_div_signed;
 
 // =================================================
 // delay synchronization signal and final assignment
